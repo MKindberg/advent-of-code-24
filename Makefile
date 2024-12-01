@@ -5,7 +5,6 @@ run: src/advent_of_code_24.gleam
 	gleam run
 
 all: $(DAYS)
-	echo $(DAYS)
 
 day% : src/day%.gleam
 	gleam run -m $@
@@ -18,3 +17,4 @@ src/advent_of_code_24.gleam: generate_main.py
 
 new:
 	./new_day.py
+	./generate_main.py
