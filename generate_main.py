@@ -4,6 +4,7 @@ import os
 
 template = """\
 import gleam/io
+import gleam/string
 
 import simplifile
 
@@ -12,8 +13,8 @@ import simplifile
 fn run_day(n: String, part1, part2) {{
     let assert Ok(input) = simplifile.read("input/day" <> n <> ".txt")
     io.println("Day " <> n <> ":")
-    io.debug(part1(input))
-    io.debug(part2(input))
+    io.debug(part1(input |> string.trim))
+    io.debug(part2(input |> string.trim))
 }}
 
 pub fn main() {{
