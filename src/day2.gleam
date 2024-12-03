@@ -3,6 +3,7 @@ import gleam/io
 import gleam/list
 import gleam/result
 import gleam/string
+import gleam/yielder
 import simplifile
 
 fn is_safe(l: List(Int)) -> Bool {
@@ -12,10 +13,10 @@ fn is_safe(l: List(Int)) -> Bool {
 }
 
 fn is_safe2(l: List(Int)) -> Bool {
-  list.range(0, list.length(l))
-  |> list.map(fn(n) { list.append(list.take(l, n), list.drop(l, n + 1)) })
-  |> list.map(is_safe)
-  |> list.any(fn(x) { x })
+  yielder.range(0, list.length(l))
+  |> yielder.map(fn(n) { list.append(list.take(l, n), list.drop(l, n + 1)) })
+  |> yielder.map(is_safe)
+  |> yielder.any(fn(x) { x })
 }
 
 fn to_int(s: String) -> List(Int) {
