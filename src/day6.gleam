@@ -1,5 +1,4 @@
 import gleam/bool
-import gleam/dict
 import gleam/io
 import gleam/list
 import gleam/result
