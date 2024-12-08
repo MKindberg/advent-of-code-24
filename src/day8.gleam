@@ -1,5 +1,6 @@
 import gleam/bool
 import gleam/dict
+import gleam/int
 import gleam/io
 import gleam/list
 import gleam/result
@@ -10,7 +11,7 @@ import simplifile
 type Coord =
   #(Int, Int)
 
-fn grid_to_coordinates(grid: List(List(String))) -> List(#(String, #(Int, Int))) {
+fn grid_to_coordinates(grid: List(List(String))) -> List(#(String, Coord)) {
   grid
   |> list.zip(list.range(1, list.length(grid)))
   |> list.map(fn(x) {
@@ -22,7 +23,6 @@ fn grid_to_coordinates(grid: List(List(String))) -> List(#(String, #(Int, Int)))
     list.zip(x.0, coordinates)
   })
   |> list.flatten
-  |> list.filter(fn(x) { x.0 != "." })
 }
 
 fn diff(n1: Coord, n2: Coord) -> Coord {
@@ -45,59 +45,53 @@ fn tuple_add_n(t1: #(Int, Int), t2: #(Int, Int), n) {
   #(t1.0 + t2.0 * n, t1.1 + t2.1 * n)
 }
 
-fn antinodes_pair(p: #(#(String, Coord), #(String, Coord))) {
-  let c1 = p.0.1
-  let c2 = p.1.1
-  let d = diff(c1, c2)
-  let nd = #(-d.0, -d.1)
+fn gen_2_antinodes(p: #(Coord, Coord), inside_bounds) {
+  let d = diff(p.0, p.1)
+  let nd = tuple_map(d, int.negate)
 
-  let a1 = tuple_add(c1, d)
-  let a2 = tuple_add(c2, nd)
+  let a1 = tuple_add(p.0, d)
+  let a2 = tuple_add(p.1, nd)
 
-  [a1, a2]
+  [a1, a2] |> list.filter(inside_bounds)
 }
 
-fn antinodes_pair2(p: #(#(String, Coord), #(String, Coord)), inside_bounds) {
-  let c1 = p.0.1
-  let c2 = p.1.1
-  let d = diff(c1, c2)
-  let nd = #(-d.0, -d.1)
+fn gen_all_antinodes(p: #(Coord, Coord), inside_bounds) {
+  let d = diff(p.0, p.1)
+  let nd = tuple_map(d, int.negate)
 
   let a1 =
     yielder.range(0, 1000)
-    |> yielder.map(tuple_add_n(c1, d, _))
+    |> yielder.map(tuple_add_n(p.0, d, _))
     |> yielder.take_while(inside_bounds)
     |> yielder.to_list
   let a2 =
     yielder.range(0, 1000)
-    |> yielder.map(tuple_add_n(c2, nd, _))
+    |> yielder.map(tuple_add_n(p.1, nd, _))
     |> yielder.take_while(inside_bounds)
     |> yielder.to_list
 
   list.append(a1, a2)
 }
 
-fn antinodes(l, inside_bounds) {
+fn antinodes(l, generator, inside_bounds) {
   l
   |> list.combination_pairs
-  |> list.map(antinodes_pair)
+  |> list.map(generator(_, inside_bounds))
   |> list.flatten
-  |> list.filter(inside_bounds)
 }
 
-fn antinodes2(l, inside_bounds) {
+fn count_unique(l) -> Int {
   l
-  |> list.combination_pairs
-  |> list.map(antinodes_pair2(_, inside_bounds))
   |> list.flatten
-  |> list.filter(inside_bounds)
+  |> list.unique
+  |> list.length
+}
+
+fn tuple_map(t: #(a, a), f: fn(a) -> b) -> #(b, b) {
+  #(f(t.0), f(t.1))
 }
 
 pub fn solve(input: String) {
-  #(part1(input), part2(input))
-}
-
-pub fn part1(input: String) {
   let grid =
     input
     |> string.split("\n")
@@ -107,38 +101,16 @@ pub fn part1(input: String) {
   let width = list.first(grid) |> result.unwrap([]) |> list.length
   let inside_bounds = fn(c) { !out_of_bounds(c, width, height) }
 
-  grid
-  |> grid_to_coordinates
-  |> list.group(fn(x) { x.0 })
-  |> dict.to_list
-  |> list.map(fn(x) { x.1 })
-  // |> list.chunk(fn(x) { x.0 })
-  |> list.map(antinodes(_, inside_bounds))
-  |> list.flatten
-  |> list.unique
-  |> list.length
-}
+  let groups =
+    grid
+    |> grid_to_coordinates
+    |> list.sort(fn(a, b) { string.compare(a.0, b.0) })
+    |> list.chunk(fn(x) { x.0 })
+    |> list.map(list.map(_, fn(x) { x.1 }))
 
-pub fn part2(input: String) {
-  let grid =
-    input
-    |> string.split("\n")
-    |> list.map(string.to_graphemes)
-
-  let height = list.length(grid)
-  let width = list.first(grid) |> result.unwrap([]) |> list.length
-  let inside_bounds = fn(c) { !out_of_bounds(c, width, height) }
-
-  grid
-  |> grid_to_coordinates
-  |> list.group(fn(x) { x.0 })
-  |> dict.to_list
-  |> list.map(fn(x) { x.1 })
-  // |> list.chunk(fn(x) { x.0 })
-  |> list.map(antinodes2(_, inside_bounds))
-  |> list.flatten
-  |> list.unique
-  |> list.length
+  #(gen_2_antinodes, gen_all_antinodes)
+  |> tuple_map(fn(f) { list.map(groups, antinodes(_, f, inside_bounds)) })
+  |> tuple_map(count_unique)
 }
 
 const test_input = "............
@@ -157,8 +129,6 @@ const test_input = "............
 pub fn main() {
   let assert Ok(input) = simplifile.read("input/day8.txt")
   let input = string.trim(input)
-  io.debug(part1(test_input))
-  io.debug(part1(input))
-  io.debug(part2(test_input))
-  io.debug(part2(input))
+  io.debug(solve(test_input))
+  io.debug(solve(input))
 }
