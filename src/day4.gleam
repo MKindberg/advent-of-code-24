@@ -50,6 +50,10 @@ fn search(l, word: String) {
   |> int.sum
 }
 
+pub fn solve(input: String) {
+  #(part1(input), part2(input))
+}
+
 pub fn part1(input: String) {
   let l = string.split(input, "\n")
   search(l, "XMAS") + search(l, "SAMX")

@@ -11,6 +11,10 @@ fn to_ints(l) -> List(Int) {
   l |> option.values |> list.map(int.parse) |> result.values
 }
 
+pub fn solve(input: String) {
+  #(part1(input), part2(input))
+}
+
 pub fn part1(input: String) {
   let assert Ok(r) = regexp.from_string("mul\\((\\d{1,3}),(\\d{0,3})\\)")
   regexp.scan(r, input)

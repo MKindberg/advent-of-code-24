@@ -93,6 +93,10 @@ fn antinodes2(l, inside_bounds) {
   |> list.filter(inside_bounds)
 }
 
+pub fn solve(input: String) {
+  #(part1(input), part2(input))
+}
+
 pub fn part1(input: String) {
   let grid =
     input

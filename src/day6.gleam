@@ -79,6 +79,10 @@ fn grid_to_coordinates(grid: List(List(String))) -> List(#(String, #(Int, Int)))
   |> list.filter(fn(x) { x.0 != "." })
 }
 
+pub fn solve(input: String) {
+  #(part1(input), part2(input))
+}
+
 pub fn part1(input: String) {
   let grid =
     input

@@ -25,7 +25,11 @@ fn to_lists(in: String) {
   |> list.unzip
 }
 
-pub fn part1(input: String) {
+pub fn solve(input: String) {
+  #(part1(input), part2(input))
+}
+
+fn part1(input: String) {
   let #(l1, l2) =
     to_lists(input)
     |> tuple_map(list.sort(_, int.compare))
@@ -34,7 +38,7 @@ pub fn part1(input: String) {
   |> int.sum
 }
 
-pub fn part2(input: String) {
+fn part2(input: String) {
   let #(l1, l2) = to_lists(input)
   list.map(l1, fn(x) { x * list.count(l2, fn(y) { x == y }) })
   |> int.sum

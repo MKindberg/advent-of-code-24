@@ -47,6 +47,10 @@ fn get_middle(update: List(Int)) -> Int {
   |> result.unwrap(0)
 }
 
+pub fn solve(input: String) {
+  #(part1(input), part2(input))
+}
+
 pub fn part1(input: String) {
   let assert [rules, updates] = string.split(input, "\n\n")
   let rules = parse_rules(rules)

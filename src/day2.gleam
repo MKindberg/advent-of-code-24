@@ -23,6 +23,10 @@ fn to_int(s: String) -> List(Int) {
   s |> string.split(" ") |> list.map(int.parse) |> result.values
 }
 
+pub fn solve(input: String) {
+  #(part1(input), part2(input))
+}
+
 pub fn part1(input: String) {
   input
   |> string.split("\n")

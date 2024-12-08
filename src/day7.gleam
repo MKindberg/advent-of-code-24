@@ -53,6 +53,10 @@ fn is_solvable_iter2(vals, ans, acc) -> Bool {
   }
 }
 
+pub fn solve(input: String) {
+  #(part1(input), part2(input))
+}
+
 pub fn part1(input: String) {
   input
   |> string.trim
