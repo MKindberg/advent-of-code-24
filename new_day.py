@@ -5,6 +5,7 @@ import subprocess
 
 template = """\
 import gleam/io
+import gleam/string
 import simplifile
 
 pub fn solve(input: String) {{

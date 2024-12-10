@@ -20,8 +20,8 @@ fn checksum(files, disk) {
 
 fn calc(idx, size, name) {
   list.range(idx, idx + size - 1)
-  |> list.map(fn(x) { x * name })
   |> int.sum
+  |> int.multiply(name)
 }
 
 fn checksum_iter(disk, movable, idx, sum) {
@@ -109,7 +109,6 @@ pub fn solve(input: String) {
     |> list.append([0])
     |> list.sized_chunk(2)
     |> list.index_map(fn(f, name) {
-      list.length(f)
       let assert [size, free] = f
       #(#(name, size), free)
     })
