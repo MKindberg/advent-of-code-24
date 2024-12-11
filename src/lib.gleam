@@ -1,4 +1,5 @@
 import gleam/bool
+import gleam/dict.{type Dict}
 import gleam/int
 import gleam/list
 import gleam/result
@@ -34,6 +35,14 @@ pub fn tuple_map(t: #(a, a), f: fn(a) -> b) -> #(b, b) {
 
 pub fn tuple_add(a: #(Int, Int), b: #(Int, Int)) -> #(Int, Int) {
   #(a.0 + b.0, a.1 + b.1)
+}
+
+pub fn dict_add(d: Dict(k, Int), key: k, val: Int) -> Dict(k, Int) {
+  d
+  |> dict.get(key)
+  |> result.unwrap(0)
+  |> int.add(val)
+  |> dict.insert(d, key, _)
 }
 
 pub fn parse_int(i: String) {

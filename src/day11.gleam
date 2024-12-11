@@ -1,4 +1,5 @@
 import gleam/bool
+import gleam/dict.{type Dict}
 import gleam/int
 import gleam/io
 import gleam/list
@@ -19,15 +20,27 @@ fn transform(i: Int) -> List(Int) {
   [i * 2024]
 }
 
-fn blink(l: List(Int)) -> List(Int) {
-  l |> list.map(transform) |> list.flatten
+fn blink(d: Dict(Int, Int)) -> Dict(Int, Int) {
+  use acc, key, val <- dict.fold(d, dict.new())
+  use acc, x <- list.fold(transform(key), acc)
+  lib.dict_add(acc, x, val)
+}
+
+fn stones_after_n(n: Int, input: Dict(Int, Int)) -> Int {
+  list.range(1, n)
+  |> list.fold(input, fn(acc, _) { blink(acc) })
+  |> dict.values
+  |> int.sum
 }
 
 pub fn solve(input: String) {
   let input = input |> string.split(" ") |> list.map(lib.parse_int)
-  list.range(1, 25)
-  |> list.fold(input, fn(acc, _) { blink(acc) })
-  |> list.length
+  let input =
+    input
+    |> list.map(fn(x) { #(x, list.count(input, fn(y) { y == x })) })
+    |> dict.from_list
+
+  [25, 75] |> list.map(stones_after_n(_, input))
 }
 
 pub fn main() {
