@@ -8,7 +8,7 @@ import gleam/string
 pub type Coord =
   #(Int, Int)
 
-pub fn string_to_coordinates(input: String) {
+pub fn string_to_coordinates(input: String) -> List(#(#(Int, Int), String)) {
   input
   |> string.split("\n")
   |> list.map(string.to_graphemes)
