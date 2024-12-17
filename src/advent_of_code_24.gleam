@@ -17,6 +17,9 @@ import day11
 import day12
 import day13
 import day14
+import day15
+import day16
+import day17
 
 fn run_day(n: String, solve) {
     let assert Ok(input) = simplifile.read("input/day" <> n <> ".txt")
@@ -40,4 +43,7 @@ pub fn main() {
     run_day("12", day12.solve)
     run_day("13", day13.solve)
     run_day("14", day14.solve)
+    run_day("15", day15.solve)
+    run_day("16", day16.solve)
+    run_day("17", day17.solve)
 }
