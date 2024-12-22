@@ -3,8 +3,8 @@ import gleam/dict
 import gleam/int
 import gleam/io
 import gleam/list
+import gleam/otp/task
 import gleam/result
-import gleam/set
 import gleam/string
 import lib
 import simplifile
@@ -55,6 +55,10 @@ fn diffs(l) {
   |> list.map2(l, int.subtract)
 }
 
+fn spawn_task(i) {
+  task.async(fn() { initial_to_dict(i) })
+}
+
 fn initial_to_dict(i) {
   let prices = i |> first_2k_prices
   let price_diffs = diffs(prices)
@@ -63,7 +67,7 @@ fn initial_to_dict(i) {
     prices
     |> list.drop(4)
     |> list.zip(seqs, _)
-  |> list.reverse
+    |> list.reverse
   stops |> dict.from_list
 }
 
@@ -73,7 +77,8 @@ pub fn solve(input: String) {
   let p1 = initials |> list.map(gen_2000) |> int.sum
   let p2 =
     initials
-    |> list.map(initial_to_dict)
+    |> list.map(spawn_task)
+    |> list.map(task.await_forever)
     |> list.fold(dict.new(), fn(acc, x) {
       dict.combine(acc, x, fn(a, b) { a + b })
     })
